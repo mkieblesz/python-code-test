@@ -99,6 +99,11 @@ at `/redoc/` in Redoc UI.
     to assign starship to listing. Better to use model, or even better provide
     starship id. Additionally it would be good to provide listing name/headline.
 
+* Acvtivating/Deactivation
+
+    Separate path for activation/deactivation of listings was created, in case
+    there will be different permissions for that and normal update.
+
 * Development environmet modification
 
     Since many tasks have to be done periodically by all developers additional
@@ -117,8 +122,9 @@ at `/redoc/` in Redoc UI.
 
 ## TODO
 
-* consider using api views instead of viewsets since they look a bit unintuitive
-* start using factory boy for fixture generation, similar or different test
+* consider using viewsets and choose serializer based on action not request
+  method
+* start using some utility for fixture generation, similar or different test
   runner altogether like pytest
 * consider generic metadata class to pick up on DjangoFilterBackend and
   autogenerate options, or making another lookup endpoint for getting available

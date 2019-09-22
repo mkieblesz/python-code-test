@@ -11,9 +11,9 @@ class TestImportStarships(TestCase):
     @requests_mock.Mocker()
     def test_handle(self, m):
         # mock requests responses
-        with open('shiptrader/tests/data/first_page.json', 'r') as f:
+        with open('shiptrader/tests/data/responses/first_page.json', 'r') as f:
             m.get('https://swapi.co/api/starships', text=f.read())
-        with open('shiptrader/tests/data/second_page.json', 'r') as f:
+        with open('shiptrader/tests/data/responses/second_page.json', 'r') as f:
             m.get('https://swapi.co/api/starships/?page=2', text=f.read())
 
         # capture command output

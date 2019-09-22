@@ -1,38 +1,41 @@
 from django_filters import rest_framework as django_filters
-from rest_framework import filters, mixins, viewsets, decorators, response
+from rest_framework import filters, generics, mixins
 
-from .metadata import ListingViewSetMetadata
+from .metadata import ListingListViewMetadata
 from .models import Listing, Starship
-from .serializers import ListingSerializer, ListingListSerializer, StarshipSerializer
+from .serializers import (
+    ListingSerializer,
+    ListingUpdateStatusSerializer,
+    ListingCreateSerializer,
+    StarshipSerializer,
+)
 
 
-class StarshipViewSet(viewsets.ReadOnlyModelViewSet):
+class StarshipListView(generics.ListAPIView):
     serializer_class = StarshipSerializer
     queryset = Starship.objects.all()
 
 
-class ListingViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    metadata_class = ListingViewSetMetadata
+class ListingRetrieveView(generics.RetrieveAPIView):
     queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
 
-    filter_backends = [django_filters.DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['ship_type__starship_class']
-    ordering_fields = ['price', 'created_at']
 
-    def get_serializer_class(self, *args, **kwargs):
-        if self.request.method == 'POST':
-            return ListingSerializer
-        return ListingListSerializer
+class ListingListCreateView(generics.ListCreateAPIView):
+    metadata_class = ListingListViewMetadata
+    queryset = Listing.objects.all()
+    serializer_class = ListingSerializer
+    filter_backends = (django_filters.DjangoFilterBackend, filters.OrderingFilter)
+    filterset_fields = ('ship_type__starship_class',)
+    ordering_fields = ('price', 'created_at')
 
-    @decorators.action(detail=True, methods=['PATCH'], url_path='toggle-activation-status')
-    def toggle_activation_status(self, request, pk=None):
-        listing = self.get_object()
-        listing.active = not listing.active
-        listing.save()
+    def get_serializer_class(self):
+        return ListingCreateSerializer if self.request.method == 'POST' else ListingSerializer
 
-        return response.Response(ListingSerializer(listing).data)
+
+class ListingUpdateStatusView(mixins.UpdateModelMixin, generics.GenericAPIView):
+    queryset = Listing.objects.all()
+    serializer_class = ListingUpdateStatusSerializer
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)

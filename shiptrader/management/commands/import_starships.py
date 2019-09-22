@@ -17,7 +17,7 @@ def prepare_starship_data(data):
     # remove comma digit grouping from suspect integer and float fields
     # 1,600 becomes 1600
     for field in ['length', 'cargo_capacity', 'crew', 'passengers']:
-        if data[field] is not None and ',' in data[field]:
+        if data.get(field, None) is not None and ',' in data[field]:
             data[field] = data[field].replace(',', '')
 
     # always make starship class lowercase

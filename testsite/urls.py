@@ -4,9 +4,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from shiptrader.urls import router
-
-urlpatterns = [url(r'^admin/', admin.site.urls), url(r'^api/v1/', include(router.urls))]
+urlpatterns = [url(r'^admin/', admin.site.urls), url(r'^api/v1/', include('shiptrader.urls'))]
 
 # docs views https://github.com/axnsan12/drf-yasg#id7
 schema_view = get_schema_view(

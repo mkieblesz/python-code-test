@@ -5,7 +5,7 @@ from .models import Starship, Listing
 
 @admin.register(Starship)
 class StarshipAdmin(admin.ModelAdmin):
-    list_display = [
+    list_display = (
         'name',
         'model',
         'starship_class',
@@ -15,9 +15,9 @@ class StarshipAdmin(admin.ModelAdmin):
         'cargo_capacity',
         'crew',
         'passengers',
-    ]
+    )
 
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('headline', 'ship_type', 'created_at', 'active', 'price')

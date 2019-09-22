@@ -1,37 +1,31 @@
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
 
 from .models import Listing, Starship
 
 
-class StarshipSerializer(ModelSerializer):
+class StarshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Starship
-        fields = (
-            'id',
-            'name',
-            'model',
-            'starship_class',
-            'manufacturer',
-            'length',
-            'hyperdrive_rating',
-            'cargo_capacity',
-            'crew',
-            'passengers',
-        )
+        fields = '__all__'
 
 
-class ListingSerializer(ModelSerializer):
-    active = serializers.BooleanField(read_only=True)
+class ListingSerializer(serializers.ModelSerializer):
+    ship_type = StarshipSerializer()
 
     class Meta:
         model = Listing
-        fields = ('id', 'headline', 'ship_type', 'price', 'created_at', 'active')
+        fields = '__all__'
 
 
-class ListingListSerializer(ModelSerializer):
-    ship_type = StarshipSerializer(read_only=True)
-
+class ListingCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
-        fields = ('id', 'headline', 'ship_type', 'price', 'created_at', 'active')
+        fields = '__all__'
+        read_only_fields = ('active', 'created_at')
+
+
+class ListingUpdateStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Listing
+        fields = '__all__'
+        read_only_fields = ('headline', 'ship_type', 'created_at', 'price')
