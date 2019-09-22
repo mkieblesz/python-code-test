@@ -1,3 +1,23 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Starship, Listing
+
+
+@admin.register(Starship)
+class StarshipAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'model',
+        'starship_class',
+        'manufacturer',
+        'length',
+        'hyperdrive_rating',
+        'cargo_capacity',
+        'crew',
+        'passengers',
+    ]
+
+
+@admin.register(Listing)
+class ListingAdmin(admin.ModelAdmin):
+    pass

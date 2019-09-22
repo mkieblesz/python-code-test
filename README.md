@@ -1,59 +1,130 @@
-# Ostmodern Python Code Test
+# Starship Marketplace API
 
-The goal of this exercise is to test that you know your way around Django and
-REST APIs. Approach it the way you would an actual long-term project.
-
-The idea is to build a platform on which your users can buy and sell Starships.
-To make this process more transparent, it has been decided to source some
-technical information about the Starships on sale from the [Starship
-API](https://swapi.co/documentation#starships).
-
-A Django project some initial data models have been created already. You may need
-to do some additional data modelling to satify the requirements.
+Browse starships and list them for sale.
 
 ## Getting started
 
-* This test works with either
-  [Docker](https://docs.docker.com/compose/install/#install-compose) or
-  [Vagrant](https://www.vagrantup.com/downloads.html)
-* Get the code from `https://github.com/ostmodern/python-code-test`
-* Do all your work in your own `develop` branch
-* Once you have downloaded the code the following commands will get the site up
-  and running
+First ensure you docker and docker-compose installed.
 
-```shell
-# For Docker
-docker-compose up
-# You can run `manage.py` commands using the `./manapy` wrapper
+* `docker>=18.09.3`
+* `docker-compose>=1.22.0`
 
-# For Vagrant
-vagrant up
-vagrant ssh
-# Inside the box
-./manage.py runserver 0.0.0.0:8008
-```
-* The default Django "It worked!" page should now be available at
-  http://localhost:8008/
+To run services run `make run` in command line. This will build docker image
+and run all services. To shut down services run `make kill`. To see all commands
+available run `make help`.
 
-## Tasks
+## Testing
 
-Your task is to build a JSON-based REST API for your frontend developers to
-consume. You have built a list of user stories with your colleagues, but you get
-to decide how to design the API. Remember that the frontend developers will need
-some documentation of your API to understand how to use it.
+Ensure services are running. To run test suite execute `make test` in command
+line. First it will lint python files using configuration placed in `setup.cfg`
+file.
 
-We do not need you to implement users or authentication, to reduce the amount of
-time this exercise will take to complete. You may use any external libraries you
-require.
+## Docs
 
-* We need to be able to import all existing
-  [Starships](https://swapi.co/documentation#starships) to the provided Starship
-  Model
-* A potential buyer can browse all Starships
-* A potential buyer can browse all the listings for a given `starship_class`
-* A potential buyer can sort listings by price or time of listing
-* To list a Starship as for sale, the user should supply the Starship name and
-  list price
-* A seller can deactivate and reactivate their listing
+Docs are dynamically generated using `drf_yasg` project and can be accessed in
+at `/redoc/` in Redoc UI.
 
-After you are done, create a release branch in your repo and send us the link.
+## Notes
+
+* Testing code which relies on external data
+
+    It is good to assume that external api schema can change without notice,
+    especially if it's supplied by low key provider. In order to avoid
+    unpleasant surprises it's good to periodically run tests against real api
+    instead of mocked responses, especially if data will be scraped
+    periodically.
+
+* Use of Django Rest Framework
+
+    DRF provies most of components necessary for REST api development out of the
+    box. It was used to make development of this test quicker. In the long run
+    it is also easier to develop and maintain, because there is already
+    structure in place like viewsets (automatic and configuratble api views
+    generation), serializers, pagination, configuration options and more.
+
+* Use of django-filters app
+
+    Django filter app is usually used to efficiently define admin list view
+    filters. It is used here since it is recommended by DRF and docs generator
+    automatically picks it up and adds to query parameters.
+
+* Api versioning
+
+    From operational point of view it's best to keep as few versions of api as
+    possible. In case our api is consumed by external clients, which we cannot
+    adjust, release branching should be considered. Then each version will have
+    it's own infrastructure. It is allowing to deploying patches to one version
+    without worrying about the other. Practically however this approach can be
+    too expensive since each version will have it's own development pipeline and
+    infrastructure. Also usually most of the code is shared between versions.
+    Best approach is to have only one version and when introducing breaking
+    changes consider forcing all clients to update, if possible.
+
+    It is also worth mentioning that in REST each endpoint will always return
+    same set of data to the client. In case there is new small requiremnt client
+    needs, like different set of fields of particular resource or data of linked
+    object, new endpoint will have to be built or current one adjusted or 2
+    requests to be made. It is inherent problem with REST apis. An alternative
+    is to have entire server api schema hardcoded on client and allow it to pick
+    and choose which data it needs, via language called GraphQL.
+
+* Endpoint available options
+
+    Fortunatelly DRF automatically generates OPTIONS method for each endpoint,
+    what allows fronted developers get available options dynamically. This
+    relates to available starship classes and ordering options.
+
+* Api docs
+
+    Api docs can be dynamically generated using Swagger/OpenApi specification.
+    Thanks to DRF autogenerated OPTIONS method there is no other action
+    necessary upon change, other than verbose description of endpoints in python
+    code.
+
+    Alternativiely docs can be written manually and stored in this repo or
+    separately and served via UIs like Apiary.
+
+* Adding starships to database only on command success
+
+    This can be done in many ways. One is to use database transactions. Other
+    is to update database once starships are scraped - they can be kept in local
+    list for example. It wasn't attempted in assignment to solve problem of
+    keeping starships in sync with 3rd party.
+
+    Each starship is identified by it's model and manufacturer.
+
+* Creating starship listings with name and price
+
+    It seems that name might not be an unique field, hence it won't be possible
+    to assign starship to listing. Better to use model, or even better provide
+    starship id. Additionally it would be good to provide listing name/headline.
+
+* Development environmet modification
+
+    Since many tasks have to be done periodically by all developers additional
+    interface was created with the use of makefile (alternativiely there could
+    be simple script with switch choices).
+
+    It was assumed that local development will only happend with the use of
+    docker, hence vagrant support was dropped.
+
+    Migration of data was abstracted from api container and moved to makefile.
+    It allows to simplify container run command to just one liner and better
+    control environemnt setup in one place. Waiting for postgres with psql not
+    always works. Sometimes user authentication might be available, but database
+    access not. This happens especially when database schema is very big. To
+    avoid any future problems pg_ready command in db container is used instead.
+
+## TODO
+
+* consider using api views instead of viewsets since they look a bit unintuitive
+* start using factory boy for fixture generation, similar or different test
+  runner altogether like pytest
+* consider generic metadata class to pick up on DjangoFilterBackend and
+  autogenerate options, or making another lookup endpoint for getting available
+  starship classes, or creating custom schema view
+* change ship_type__starship_class to starship_class. I had some problems using
+  custom parameters with djangofilterbackend. Other commong alternative is just
+  to use `filter_queryset` method and pick up params from `self.request`
+* make ordering options are showing up in API by looking into generator
+  https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/inspectors/base.py#L416
