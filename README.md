@@ -91,7 +91,7 @@ at `/redoc/` in Redoc UI.
     list for example. It wasn't attempted in assignment to solve problem of
     keeping starships in sync with 3rd party.
 
-    Each starship is identified by it's model and manufacturer.
+    Each starship is identified by it's model.
 
 * Creating starship listings with name and price
 
@@ -108,7 +108,7 @@ at `/redoc/` in Redoc UI.
 
     Since many tasks have to be done periodically by all developers additional
     interface was created with the use of makefile (alternativiely there could
-    be simple script with switch choices).
+    be simple script with switch conditions).
 
     It was assumed that local development will only happend with the use of
     docker, hence vagrant support was dropped.
@@ -120,7 +120,7 @@ at `/redoc/` in Redoc UI.
     access not. This happens especially when database schema is very big. To
     avoid any future problems pg_ready command in db container is used instead.
 
-## TODO
+## Improvements to be made
 
 * consider using viewsets and choose serializer based on action not request
   method
