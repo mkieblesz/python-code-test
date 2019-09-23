@@ -10,9 +10,9 @@ services:
       - '8008:8008'
     depends_on:
       - postgresql
-    # command: 'python manage.py runserver 0.0.0.0:8008'
+    command: 'python manage.py runserver 0.0.0.0:8008'
     # NOTE: uncomment to debug container
-    command: /bin/sh -x -c 'while true; do sleep 60; done'
+    # command: /bin/sh -x -c 'while true; do sleep 60; done'
 
   postgresql:
     image: postgres:9.6
