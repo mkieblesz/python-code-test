@@ -81,9 +81,7 @@ class ListingListViewTestCase(APITestCase):
         self.assertEqual(len(results), 5)
 
     def test_starship_class_choices(self):
-        results = self.client.options(
-            '/api/v1/listings/', params={'ship_type__starship_class': ''}
-        ).json()
+        results = self.client.options('/api/v1/listings/').json()
         self.assertListEqual(
             results['starship_class_choices'],
             ['star dreadnought', 'starfighter', 'assault starfighter'],
