@@ -122,15 +122,14 @@ at `/redoc/` in Redoc UI.
 
 ## Improvements to be made
 
-* consider using viewsets and choose serializer based on action not request
-  method
+* test requesting listing creation/update with invalid data
 * start using some utility for fixture generation, similar or different test
   runner altogether like pytest
-* consider generic metadata class to pick up on DjangoFilterBackend and
-  autogenerate options, or making another lookup endpoint for getting available
-  starship classes, or creating custom schema view
-* change ship_type__starship_class to starship_class. I had some problems using
-  custom parameters with djangofilterbackend. Other commong alternative is just
-  to use `filter_queryset` method and pick up params from `self.request`
+* override `DjangoFilterBackend` to allow model query param mapping, this will
+  allow to use `starship_class` as filter param instead of
+  `ship_type__starship_class`, this can be done by overriding `filter_queryset`
+  method
+* update default DRF metadata class so it picks up ordering options and
+  `DjangoFilterBackend`
 * make ordering options are showing up in API by looking into generator
   https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/inspectors/base.py#L416
